@@ -43,7 +43,9 @@ fetch(`https://dummyjson.com/products/category/${category}`)
 
       col.innerHTML = `
         <div class="product-card">
-          <img src="${product.thumbnail}" alt="${product.title}">
+          <a href="../pages/productDetails.html?id=${product.id}">
+            <img src="${product.thumbnail}" alt="${product.title}">
+          </a>
           <div class="product-info">
             <div>
               <div class="product-name">${product.title}</div>
