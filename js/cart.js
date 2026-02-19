@@ -2,10 +2,32 @@
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 cart = cart.filter(
   (item) => item && item.id && item.name && item.price && item.image,
-);
+); // This line removes any broken product.
 
 const container = document.getElementById("cart-container");
 const totalEl = document.getElementById("cart-total");
+
+// Notification message
+function showToast(message) {
+  const container = document.getElementById("toast-container");
+
+  const toast = document.createElement("div");
+  toast.classList.add("toast"); // this is for css
+  toast.textContent = message;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add("show");
+  }, 10);
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => {
+      toast.remove();
+    }, 400);
+  }, 2500);
+}
 
 // Render cart items
 function renderCart() {
@@ -23,7 +45,7 @@ function renderCart() {
     totalPrice += itemTotal;
 
     const div = document.createElement("div");
-    div.className = "cart-item justify-content-between"; // flex justify
+    div.className = "cart-item justify-content-between";
 
     div.innerHTML = `
       <img src="${item.image}" alt="${item.name}">
@@ -53,9 +75,10 @@ function renderCart() {
         if (isNaN(val) || val < 1) val = 1;
 
         // Respect stock limit
-        const stock = cart[idx].stock || 1000; // fallback stock
+        const stock = cart[idx].stock || 100;
         if (val > stock) {
           console.warn(`Max stock reached (${stock}) for ${cart[idx].name}`);
+          alert(`Max stock reached (${stock}) for ${cart[idx].name}`);
           val = stock;
           e.target.value = stock;
         }
@@ -70,7 +93,8 @@ function renderCart() {
   document.querySelectorAll(".remove-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       const idx = btn.getAttribute("data-index");
-      cart.splice(idx, 1); // remove item
+      showToast(`${cart[idx].name} removed from cart`);
+      cart.splice(idx, 1);
       localStorage.setItem("cart", JSON.stringify(cart));
       renderCart();
     });
@@ -80,7 +104,7 @@ function renderCart() {
 // Checkout button
 document.getElementById("checkout-btn").addEventListener("click", () => {
   localStorage.setItem("checkout-cart", JSON.stringify(cart));
-  window.location.href = "checkout.html";
+  window.location.href = "../pages/checkout.html";
 });
 
 // Initial render

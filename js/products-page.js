@@ -9,6 +9,28 @@ document.getElementById("breadcrumb-category").textContent =
 // Container for products
 const container = document.getElementById("products-container");
 
+// Notification message
+function showToast(message) {
+  const container = document.getElementById("toast-container");
+
+  const toast = document.createElement("div");
+  toast.classList.add("toast"); // this is for css
+  toast.textContent = message;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add("show");
+  }, 10);
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => {
+      toast.remove();
+    }, 400);
+  }, 2500);
+}
+
 // Fetch products from DummyJSON
 fetch(`https://dummyjson.com/products/category/${category}`)
   .then((res) => res.json())
@@ -51,6 +73,8 @@ fetch(`https://dummyjson.com/products/category/${category}`)
         const productImage = button.getAttribute("data-image");
         const productStock = parseInt(button.getAttribute("data-stock"));
 
+        showToast(`${productName} added to cart`);
+
         if (
           !productId ||
           !productName ||
@@ -74,6 +98,9 @@ fetch(`https://dummyjson.com/products/category/${category}`)
             console.warn(
               `Cannot add more than stock (${productStock}) for ${productName}`,
             );
+            alert(
+              `Cannot add more than stock (${productStock}) for ${productName}`,
+            );
             return; // prevent exceeding stock
           }
           existing.quantity += 1;
@@ -90,6 +117,7 @@ fetch(`https://dummyjson.com/products/category/${category}`)
 
         localStorage.setItem("cart", JSON.stringify(cart));
         console.log(`${productName} added to cart`, cart);
+        // alert(`${productName} added to cart`, cart);
       });
     });
   })
