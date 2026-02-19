@@ -46,16 +46,13 @@ a {
   color: var(--primary);
 }
 
-.btn-login {
-  background-color: var(--secondary);
-  color: white;
-  padding: 6px 16px;
-  border-radius: 30px;
+.btn i {
+  color: var(--primary);
+  font-size: 1.4rem;
 }
 
-.btn-login:hover {
-  background-color: #00b3a0;
-  color: white;
+.btn i:hover {
+  color: var(--secondary);
 }
 
 /* ================= HERO SLIDER ================= */
