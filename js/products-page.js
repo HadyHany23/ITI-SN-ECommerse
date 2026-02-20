@@ -1,30 +1,30 @@
 // Get selected category from URL
 const params = new URLSearchParams(window.location.search);
-const category = params.get("category") || "smartphones";
+const category = params.get('category') || 'smartphones';
 
 // Update breadcrumb
-document.getElementById("breadcrumb-category").textContent =
+document.getElementById('breadcrumb-category').textContent =
   category.charAt(0).toUpperCase() + category.slice(1);
 
 // Container for products
-const container = document.getElementById("products-container");
+const container = document.getElementById('products-container');
 
 // Notification message
 function showToast(message) {
-  const containerToast = document.getElementById("toast-container");
+  const containerToast = document.getElementById('toast-container');
 
-  const toast = document.createElement("div");
-  toast.classList.add("toast"); // this is for css
+  const toast = document.createElement('div');
+  toast.classList.add('toast'); // this is for css
   toast.textContent = message;
 
   containerToast.appendChild(toast);
 
   setTimeout(() => {
-    toast.classList.add("show");
+    toast.classList.add('show');
   }, 10);
 
   setTimeout(() => {
-    toast.classList.remove("show");
+    toast.classList.remove('show');
     setTimeout(() => {
       toast.remove();
     }, 400);
@@ -36,7 +36,7 @@ let products = [];
 
 // Render products function
 function renderProducts(productsArray) {
-  container.innerHTML = "";
+  container.innerHTML = '';
 
   if (productsArray.length === 0) {
     container.innerHTML = "<h4 class='text-center mt-4'>Item not found</h4>";
@@ -44,8 +44,8 @@ function renderProducts(productsArray) {
   }
 
   productsArray.forEach((product) => {
-    const col = document.createElement("div");
-    col.className = "col-lg-3 col-md-4 col-6";
+    const col = document.createElement('div');
+    col.className = 'col-lg-3 col-md-4 col-6';
 
     col.innerHTML = `
       <div class="product-card">
@@ -71,15 +71,15 @@ function renderProducts(productsArray) {
   });
 
   // Add event listeners for Add to Cart buttons
-  document.querySelectorAll(".btn-add").forEach((button) => {
-    button.addEventListener("click", (e) => {
+  document.querySelectorAll('.btn-add').forEach((button) => {
+    button.addEventListener('click', (e) => {
       e.preventDefault();
 
-      const productId = button.getAttribute("data-id");
-      const productName = button.getAttribute("data-name");
-      const productPrice = parseFloat(button.getAttribute("data-price"));
-      const productImage = button.getAttribute("data-image");
-      const productStock = parseInt(button.getAttribute("data-stock"));
+      const productId = button.getAttribute('data-id');
+      const productName = button.getAttribute('data-name');
+      const productPrice = parseFloat(button.getAttribute('data-price'));
+      const productImage = button.getAttribute('data-image');
+      const productStock = parseInt(button.getAttribute('data-stock'));
 
       showToast(`${productName} added to cart`);
 
@@ -90,24 +90,24 @@ function renderProducts(productsArray) {
         !productImage ||
         isNaN(productStock)
       ) {
-        console.error("Invalid product data, skipping add to cart");
+        console.error('Invalid product data, skipping add to cart');
         return;
       }
 
       // Get existing cart
-      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
       cart = cart.filter(
-        (item) => item && item.id && item.name && item.price && item.image,
+        (item) => item && item.id && item.name && item.price && item.image
       );
 
       const existing = cart.find((item) => item.id == productId);
       if (existing) {
         if (existing.quantity + 1 > productStock) {
           console.warn(
-            `Cannot add more than stock (${productStock}) for ${productName}`,
+            `Cannot add more than stock (${productStock}) for ${productName}`
           );
           alert(
-            `Cannot add more than stock (${productStock}) for ${productName}`,
+            `Cannot add more than stock (${productStock}) for ${productName}`
           );
           return; // prevent exceeding stock
         }
@@ -123,7 +123,7 @@ function renderProducts(productsArray) {
         });
       }
 
-      localStorage.setItem("cart", JSON.stringify(cart));
+      localStorage.setItem('cart', JSON.stringify(cart));
       console.log(`${productName} added to cart`, cart);
     });
   });
@@ -139,21 +139,21 @@ fetch(`https://dummyjson.com/products/category/${category}`)
   .catch((err) => console.error(err));
 
 // search on product by name
-const searchForm = document.getElementById("search-form");
-const searchInput = document.getElementById("search-input");
+const searchForm = document.getElementById('search-form');
+const searchInput = document.getElementById('search-input');
 
-searchForm.addEventListener("submit", (e) => {
+searchForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const searchValue = searchInput.value.trim().toLowerCase();
 
-  if (searchValue === "") {
+  if (searchValue === '') {
     renderProducts(products); // show all if empty
     return;
   }
 
   const filteredProducts = products.filter((product) =>
-    product.title.toLowerCase().includes(searchValue),
+    product.title.toLowerCase().includes(searchValue)
   );
 
   renderProducts(filteredProducts);

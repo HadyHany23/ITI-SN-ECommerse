@@ -1,28 +1,28 @@
 // Get cart from localStorage and filter invalid items
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
 cart = cart.filter(
-  (item) => item && item.id && item.name && item.price && item.image,
+  (item) => item && item.id && item.name && item.price && item.image
 ); // This line removes any broken product.
 
-const container = document.getElementById("cart-container");
-const totalEl = document.getElementById("cart-total");
+const container = document.getElementById('cart-container');
+const totalEl = document.getElementById('cart-total');
 
 // Notification message
 function showToast(message) {
-  const container = document.getElementById("toast-container");
+  const container = document.getElementById('toast-container');
 
-  const toast = document.createElement("div");
-  toast.classList.add("toast"); // this is for css
+  const toast = document.createElement('div');
+  toast.classList.add('toast'); // this is for css
   toast.textContent = message;
 
   container.appendChild(toast);
 
   setTimeout(() => {
-    toast.classList.add("show");
+    toast.classList.add('show');
   }, 10);
 
   setTimeout(() => {
-    toast.classList.remove("show");
+    toast.classList.remove('show');
     setTimeout(() => {
       toast.remove();
     }, 400);
@@ -31,10 +31,10 @@ function showToast(message) {
 
 // Render cart items
 function renderCart() {
-  container.innerHTML = "";
+  container.innerHTML = '';
   if (cart.length === 0) {
-    container.innerHTML = "<p>Your cart is empty.</p>";
-    totalEl.textContent = "0";
+    container.innerHTML = '<p>Your cart is empty.</p>';
+    totalEl.textContent = '0';
     return;
   }
 
@@ -44,15 +44,17 @@ function renderCart() {
     const itemTotal = item.price * item.quantity;
     totalPrice += itemTotal;
 
-    const div = document.createElement("div");
-    div.className = "cart-item justify-content-between";
+    const div = document.createElement('div');
+    div.className = 'cart-item justify-content-between';
 
     div.innerHTML = `
       <img src="${item.image}" alt="${item.name}">
       <div class="cart-info flex-grow-1">
         <div class="cart-title">${item.name}</div>
         <div class="cart-price">$${item.price}</div>
-        <label>Qty: <input type="number" min="1" value="${item.quantity}" data-index="${index}"></label>
+        <label>Qty: <input type="number" min="1" value="${
+          item.quantity
+        }" data-index="${index}"></label>
         <span class="item-total">$${itemTotal.toFixed(2)}</span>
       </div>
       <div class="cart-remove">
@@ -69,8 +71,8 @@ function renderCart() {
   document
     .querySelectorAll('.cart-info input[type="number"]')
     .forEach((input) => {
-      input.addEventListener("input", (e) => {
-        const idx = e.target.getAttribute("data-index");
+      input.addEventListener('input', (e) => {
+        const idx = e.target.getAttribute('data-index');
         let val = parseInt(e.target.value);
         if (isNaN(val) || val < 1) val = 1;
 
@@ -84,27 +86,27 @@ function renderCart() {
         }
 
         cart[idx].quantity = val;
-        localStorage.setItem("cart", JSON.stringify(cart));
+        localStorage.setItem('cart', JSON.stringify(cart));
         renderCart();
       });
     });
 
   // Event listener for remove button
-  document.querySelectorAll(".remove-btn").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      const idx = btn.getAttribute("data-index");
+  document.querySelectorAll('.remove-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const idx = btn.getAttribute('data-index');
       showToast(`${cart[idx].name} removed from cart`);
       cart.splice(idx, 1);
-      localStorage.setItem("cart", JSON.stringify(cart));
+      localStorage.setItem('cart', JSON.stringify(cart));
       renderCart();
     });
   });
 }
 
 // Checkout button
-document.getElementById("checkout-btn").addEventListener("click", () => {
-  localStorage.setItem("checkout-cart", JSON.stringify(cart));
-  window.location.href = "../pages/checkout.html";
+document.getElementById('checkout-btn').addEventListener('click', () => {
+  localStorage.setItem('checkout-cart', JSON.stringify(cart));
+  window.location.href = '../pages/checkout.html';
 });
 
 // Initial render

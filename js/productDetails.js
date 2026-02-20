@@ -1,12 +1,12 @@
 // Get product ID from URL
 const params = new URLSearchParams(window.location.search);
-const productId = params.get("id");
+const productId = params.get('id');
 
-const container = document.getElementById("product-details");
+const container = document.getElementById('product-details');
 
 // If no ID
 if (!productId) {
-  container.innerHTML = "<p>Product not found.</p>";
+  container.innerHTML = '<p>Product not found.</p>';
 } else {
   fetch(`https://dummyjson.com/products/${productId}`)
     .then((res) => res.json())
@@ -14,7 +14,7 @@ if (!productId) {
       renderProduct(product);
     })
     .catch(() => {
-      container.innerHTML = "<p>Error loading product.</p>";
+      container.innerHTML = '<p>Error loading product.</p>';
     });
 }
 
@@ -27,7 +27,7 @@ function renderProduct(product) {
   //         : "Out of Stock";
 
   const stockClass =
-    product.stock > 10 ? "available" : product.stock > 0 ? "low" : "out";
+    product.stock > 10 ? 'available' : product.stock > 0 ? 'low' : 'out';
 
   container.innerHTML = `
     <div class="image-section">
@@ -35,7 +35,7 @@ function renderProduct(product) {
       <div class="thumbnail-row">
         ${product.images
           .map((img) => `<img src="${img}" class="thumb">`)
-          .join("")}
+          .join('')}
       </div>
     </div>
 
@@ -63,17 +63,17 @@ function renderProduct(product) {
   `;
 
   // Image slider logic
-  const mainImage = document.getElementById("main-image");
-  document.querySelectorAll(".thumb").forEach((thumb) => {
-    thumb.addEventListener("click", () => {
+  const mainImage = document.getElementById('main-image');
+  document.querySelectorAll('.thumb').forEach((thumb) => {
+    thumb.addEventListener('click', () => {
       mainImage.src = thumb.src;
     });
   });
 
   // Add to cart logic
-  const addBtn = document.querySelector(".btn-add");
-  addBtn.addEventListener("click", () => {
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const addBtn = document.querySelector('.btn-add');
+  addBtn.addEventListener('click', () => {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
     const existing = cart.find((item) => item.id == product.id);
 
@@ -81,7 +81,7 @@ function renderProduct(product) {
       if (existing.quantity < product.stock) {
         existing.quantity += 1;
       } else {
-        alert("Max stock reached");
+        alert('Max stock reached');
         return;
       }
     } else {
@@ -95,7 +95,7 @@ function renderProduct(product) {
       });
     }
 
-    localStorage.setItem("cart", JSON.stringify(cart));
-    alert("Added to cart");
+    localStorage.setItem('cart', JSON.stringify(cart));
+    alert('Added to cart');
   });
 }
