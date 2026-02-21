@@ -1,44 +1,44 @@
 // ================= GET CART =================
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
 cart = cart.filter(
-  (item) => item && item.id && item.name && item.price && item.image,
+  (item) => item && item.id && item.name && item.price && item.image
 );
 
-const container = document.getElementById("cart-container");
-const totalEl = document.getElementById("cart-total");
-const checkoutBtn = document.getElementById("checkout-btn");
+const container = document.getElementById('cart-container');
+const totalEl = document.getElementById('cart-total');
+const checkoutBtn = document.getElementById('checkout-btn');
 
 // ================= SAVE CART =================
 function saveCart() {
-  localStorage.setItem("cart", JSON.stringify(cart));
+  localStorage.setItem('cart', JSON.stringify(cart));
 }
 
 // ================= TOAST =================
 function showToast(message) {
-  const toastContainer = document.getElementById("toast-container");
+  const toastContainer = document.getElementById('toast-container');
 
-  const toast = document.createElement("div");
-  toast.classList.add("toast");
+  const toast = document.createElement('div');
+  toast.classList.add('toast');
   toast.textContent = message;
 
   toastContainer.appendChild(toast);
 
-  setTimeout(() => toast.classList.add("show"), 10);
+  setTimeout(() => toast.classList.add('show'), 10);
 
   setTimeout(() => {
-    toast.classList.remove("show");
+    toast.classList.remove('show');
     setTimeout(() => toast.remove(), 400);
   }, 2500);
 }
 
 // ================= RENDER CART =================
 function renderCart() {
-  container.innerHTML = "";
+  container.innerHTML = '';
 
   if (cart.length === 0) {
-    container.innerHTML = "<p>Your cart is empty.</p>";
-    totalEl.textContent = "0";
+    container.innerHTML = '<p>Your cart is empty.</p>';
+    totalEl.textContent = '0';
     return;
   }
 
@@ -49,9 +49,9 @@ function renderCart() {
     const itemTotal = item.price * item.quantity;
     totalPrice += itemTotal;
 
-    const div = document.createElement("div");
+    const div = document.createElement('div');
     div.className =
-      "cart-item d-flex align-items-center justify-content-between mb-3";
+      'cart-item d-flex align-items-center justify-content-between mb-3';
 
     div.innerHTML = `
       <img src="${item.image}" alt="${item.name}" style="width:80px">
@@ -93,14 +93,14 @@ function renderCart() {
 }
 
 // ================= EVENT DELEGATION =================
-container.addEventListener("click", function (e) {
+container.addEventListener('click', function (e) {
   const index = e.target.dataset.index;
   if (index === undefined) return;
 
   const stock = cart[index].stock || 100;
 
   // ➕ Increase
-  if (e.target.classList.contains("qty-increase")) {
+  if (e.target.classList.contains('qty-increase')) {
     if (cart[index].quantity < stock) {
       cart[index].quantity++;
       saveCart();
@@ -111,7 +111,7 @@ container.addEventListener("click", function (e) {
   }
 
   // ➖ Decrease
-  if (e.target.classList.contains("qty-decrease")) {
+  if (e.target.classList.contains('qty-decrease')) {
     if (cart[index].quantity > 1) {
       cart[index].quantity--;
       saveCart();
@@ -120,7 +120,7 @@ container.addEventListener("click", function (e) {
   }
 
   // 🗑 Remove
-  if (e.target.classList.contains("remove-btn")) {
+  if (e.target.classList.contains('remove-btn')) {
     showToast(`${cart[index].name} removed from cart`);
     cart.splice(index, 1);
     saveCart();
@@ -129,8 +129,8 @@ container.addEventListener("click", function (e) {
 });
 
 // ================= INPUT CHANGE =================
-container.addEventListener("input", function (e) {
-  if (!e.target.classList.contains("qty-input")) return;
+container.addEventListener('input', function (e) {
+  if (!e.target.classList.contains('qty-input')) return;
 
   const index = e.target.dataset.index;
   let value = parseInt(e.target.value);
@@ -149,9 +149,9 @@ container.addEventListener("input", function (e) {
 
 // ================= CHECKOUT =================
 if (checkoutBtn) {
-  checkoutBtn.addEventListener("click", () => {
-    localStorage.setItem("checkout-cart", JSON.stringify(cart));
-    window.location.href = "../pages/checkout.html";
+  checkoutBtn.addEventListener('click', () => {
+    localStorage.setItem('checkout-cart', JSON.stringify(cart));
+    window.location.href = '../pages/checkout.html';
   });
 }
 

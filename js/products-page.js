@@ -81,8 +81,6 @@ function renderProducts(productsArray) {
       const productImage = button.getAttribute('data-image');
       const productStock = parseInt(button.getAttribute('data-stock'));
 
-      showToast(`${productName} added to cart`);
-
       if (
         !productId ||
         !productName ||
@@ -124,6 +122,7 @@ function renderProducts(productsArray) {
       }
 
       localStorage.setItem('cart', JSON.stringify(cart));
+      showToast(`${productName} has been added to your cart.`);
       console.log(`${productName} added to cart`, cart);
     });
   });

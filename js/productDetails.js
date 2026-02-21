@@ -96,6 +96,6 @@ function renderProduct(product) {
     }
 
     localStorage.setItem('cart', JSON.stringify(cart));
-    alert('Added to cart');
+    alert('This item has been added to your cart successfully.');
   });
 }
