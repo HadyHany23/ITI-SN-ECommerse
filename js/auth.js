@@ -1,67 +1,208 @@
-// Get cart from localStorage and filter invalid items
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
-cart = cart.filter(
-  (item) => item && item.id && item.name && item.price && item.image
-);
+const USERS_KEY = 'users';
+const CURRENT_USER_KEY = 'currentUser';
 
-const container = document.getElementById('cart-container');
-const totalEl = document.getElementById('cart-total');
+function getUsers() {
+  return JSON.parse(localStorage.getItem(USERS_KEY)) || [];
+}
 
-// Render cart items
-function renderCart() {
-  container.innerHTML = '';
-  if (cart.length === 0) {
-    container.innerHTML = '<p>Your cart is empty.</p>';
-    totalEl.textContent = '0';
+function saveUsers(users) {
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+}
+
+function getCurrentUser() {
+  return JSON.parse(localStorage.getItem(CURRENT_USER_KEY));
+}
+
+function setCurrentUser(user) {
+  localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+}
+
+function sanitizeEmail(email) {
+  return email.trim().toLowerCase();
+}
+
+function initializeRegisterPage() {
+  const form = document.getElementById('register-form');
+  const status = document.getElementById('register-status');
+
+  if (!form || !status) {
     return;
   }
 
-  let totalPrice = 0;
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
 
-  cart.forEach((item, index) => {
-    const itemTotal = item.price * item.quantity;
-    totalPrice += itemTotal;
+    const name = document.getElementById('register-name').value.trim();
+    const email = sanitizeEmail(
+      document.getElementById('register-email').value
+    );
+    const password = document.getElementById('register-password').value;
+    const confirmPassword = document.getElementById(
+      'register-confirm-password'
+    ).value;
 
-    const div = document.createElement('div');
-    div.className = 'cart-item';
+    if (!name || !email || !password || !confirmPassword) {
+      status.textContent = 'Please fill in all fields.';
+      status.className = 'auth-status error';
+      return;
+    }
 
-    div.innerHTML = `
-      <img src="${item.image}" alt="${item.name}">
-      <div class="cart-info">
-        <div class="cart-title">${item.name}</div>
-        <div class="cart-price">$${item.price}</div>
-        <label>Qty: <input type="number" min="1" value="${
-          item.quantity
-        }" data-index="${index}"></label>
-        <span class="item-total">$${itemTotal.toFixed(2)}</span>
-      </div>
-    `;
+    if (password !== confirmPassword) {
+      status.textContent = 'Passwords do not match.';
+      status.className = 'auth-status error';
+      return;
+    }
 
-    container.appendChild(div);
-  });
+    const users = getUsers();
+    const alreadyExists = users.some((user) => user.email === email);
 
-  totalEl.textContent = totalPrice.toFixed(2);
+    if (alreadyExists) {
+      status.textContent = 'Email already exists. Please login.';
+      status.className = 'auth-status error';
+      return;
+    }
 
-  // Event listener for quantity input
-  document
-    .querySelectorAll('.cart-info input[type="number"]')
-    .forEach((input) => {
-      input.addEventListener('input', (e) => {
-        const idx = e.target.getAttribute('data-index');
-        let val = parseInt(e.target.value);
-        if (isNaN(val) || val < 1) val = 1;
-        cart[idx].quantity = val;
-        localStorage.setItem('cart', JSON.stringify(cart));
-        renderCart();
-      });
+    const newUser = {
+      id: Date.now().toString(),
+      name,
+      email,
+      password,
+      createdAt: new Date().toISOString(),
+    };
+
+    users.push(newUser);
+    saveUsers(users);
+    setCurrentUser({
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      createdAt: newUser.createdAt,
     });
+
+    status.textContent = 'Account created successfully. Redirecting...';
+    status.className = 'auth-status success';
+
+    setTimeout(() => {
+      window.location.href = 'profile.html';
+    }, 700);
+  });
 }
 
-// Checkout button
-document.getElementById('checkout-btn').addEventListener('click', () => {
-  localStorage.setItem('checkout-cart', JSON.stringify(cart));
-  window.location.href = 'checkout.html';
-});
+function initializeLoginPage() {
+  const form = document.getElementById('login-form');
+  const status = document.getElementById('login-status');
 
-// Initial render
-renderCart();
+  if (!form || !status) {
+    return;
+  }
+
+  const loggedInUser = getCurrentUser();
+  if (loggedInUser) {
+    window.location.href = 'profile.html';
+    return;
+  }
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    const email = sanitizeEmail(document.getElementById('login-email').value);
+    const password = document.getElementById('login-password').value;
+
+    const users = getUsers();
+    const matchedUser = users.find(
+      (user) => user.email === email && user.password === password
+    );
+
+    if (!matchedUser) {
+      status.textContent = 'Invalid email or password.';
+      status.className = 'auth-status error';
+      return;
+    }
+
+    setCurrentUser({
+      id: matchedUser.id,
+      name: matchedUser.name,
+      email: matchedUser.email,
+      createdAt: matchedUser.createdAt,
+    });
+
+    status.textContent = 'Login successful. Redirecting...';
+    status.className = 'auth-status success';
+
+    setTimeout(() => {
+      window.location.href = 'profile.html';
+    }, 700);
+  });
+}
+
+function initializeProfilePage() {
+  const guestView = document.getElementById('profile-guest-view');
+  const userView = document.getElementById('profile-user-view');
+  const nameEl = document.getElementById('profile-name');
+  const emailEl = document.getElementById('profile-email');
+  const joinedEl = document.getElementById('profile-joined');
+  const logoutBtn = document.getElementById('logout-btn');
+  const editForm = document.getElementById('profile-edit-form');
+  const editName = document.getElementById('edit-name');
+  const status = document.getElementById('profile-status');
+
+  if (!guestView || !userView) {
+    return;
+  }
+
+  const currentUser = getCurrentUser();
+
+  if (!currentUser) {
+    guestView.classList.remove('d-none');
+    userView.classList.add('d-none');
+    return;
+  }
+
+  guestView.classList.add('d-none');
+  userView.classList.remove('d-none');
+
+  nameEl.textContent = currentUser.name;
+  emailEl.textContent = currentUser.email;
+  joinedEl.textContent = currentUser.createdAt
+    ? new Date(currentUser.createdAt).toLocaleDateString()
+    : '-';
+  editName.value = currentUser.name;
+
+  logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem(CURRENT_USER_KEY);
+    window.location.href = 'login.html';
+  });
+
+  editForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    const updatedName = editName.value.trim();
+
+    if (!updatedName) {
+      status.textContent = 'Name cannot be empty.';
+      status.className = 'auth-status error mt-3';
+      return;
+    }
+
+    const users = getUsers();
+    const userIndex = users.findIndex((user) => user.id === currentUser.id);
+
+    if (userIndex !== -1) {
+      users[userIndex].name = updatedName;
+      saveUsers(users);
+    }
+
+    const updatedCurrentUser = { ...currentUser, name: updatedName };
+    setCurrentUser(updatedCurrentUser);
+
+    nameEl.textContent = updatedName;
+    status.textContent = 'Profile updated successfully.';
+    status.className = 'auth-status success mt-3';
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initializeRegisterPage();
+  initializeLoginPage();
+  initializeProfilePage();
+});
