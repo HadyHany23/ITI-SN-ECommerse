@@ -126,7 +126,7 @@ a {
   width: 100%;
   padding: 15px;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
-  color: white;
+  color: var(--accent);
   font-weight: 500;
   text-align: center;
   font-size: 1.1rem;
@@ -211,7 +211,7 @@ a {
 
 .product-card .btn-add {
   background-color: var(--secondary);
-  color: white;
+  color: var(--accent);
   border-radius: 25px;
   padding: 6px 12px;
   font-size: 0.9rem;
@@ -219,8 +219,8 @@ a {
 }
 
 .product-card .btn-add:hover {
-  background-color: #00b3a0;
-  color: white;
+  background-color: var(--primary);
+  color: var(--accent);
 }
 
 .product-card:hover {
@@ -261,7 +261,7 @@ a {
   align-items: center;
   gap: 20px;
   padding: 15px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--neutral);
 }
 
 .cart-item img {
@@ -293,12 +293,12 @@ a {
   width: 70px;
   padding: 5px 8px;
   border-radius: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--neutral);
 }
 
 .cart-item .cart-info .item-total {
   font-weight: 600;
-  color: #333;
+  color: var(--secondary);
   margin-left: 10px;
 }
 
@@ -321,6 +321,8 @@ a {
 
 .cart-remove .remove-btn {
   font-size: 1.3rem;
+  cursor: pointer;
+  color: #ff4d4f;
   transition:
     transform 0.2s ease,
     color 0.2s ease;
@@ -371,7 +373,7 @@ a {
 }
 
 .thumbnail-row img:hover {
-  border-color: #333;
+  border-color: var(--secondary);
 }
 
 .info-section {
@@ -410,14 +412,14 @@ a {
   margin-top: 20px;
   padding: 10px 20px;
   background: var(--primary);
-  color: white;
+  color: var(--accent);
   border-radius: 8px;
   cursor: pointer;
   transition: 0.3s;
 }
 
 .btn-add:hover {
-  background: black;
+  background: var(--secondary);
   transform: scale(1.1);
 }
 
@@ -445,7 +447,7 @@ a {
 .about-container p {
   font-size: 1.1rem;
   line-height: 1.8;
-  color: #181a1b;
+  color: var(--secondary);
   margin-bottom: 20px;
 }
 
@@ -459,7 +461,7 @@ a {
 
 .feature-card {
   flex: 1 1 250px;
-  background-color: #f5f5f5;
+  background-color: var(--neutral);
   border-radius: 12px;
   padding: 25px 20px;
   text-align: center;
@@ -479,12 +481,12 @@ a {
 .feature-card h3 {
   font-size: 1.3rem;
   margin-bottom: 10px;
-  color: #181a1b;
+  color: var(--secondary);
 }
 
 .feature-card p {
   font-size: 1rem;
-  color: #333;
+  color: var(--secondary);
 }
 
 @media (max-width: 768px) {
@@ -519,7 +521,7 @@ a {
 
 .info-card {
   flex: 1 1 250px;
-  background-color: #f5f5f5;
+  background-color: var(--neutral);
   border-radius: 12px;
   padding: 20px;
   text-align: center;
@@ -539,19 +541,19 @@ a {
 .info-card h3 {
   font-size: 1.2rem;
   margin-bottom: 8px;
-  color: #181a1b;
+  color: var(--secondary);
 }
 
 .info-card p {
   font-size: 1rem;
-  color: #333;
+  color: var(--secondary);
 }
 
 .contact-form {
-  background-color: #f5f5f5;
+  background-color: var(--neutral);
   border-radius: 12px;
   padding: 30px;
-  border: 1px solid black;
+  border: 1px solid var(--secondary);
 }
 
 .contact-form label {
@@ -560,7 +562,7 @@ a {
 
 .contact-form button {
   background-color: var(--primary);
-  color: #fff;
+  color: var(--accent);
   border: none;
   padding: 10px 20px;
   border-radius: 8px;
@@ -582,7 +584,7 @@ a {
 
 .footer {
   background-color: var(--secondary);
-  color: white;
+  color: var(--accent);
   padding: 50px 0 20px;
 }
 
@@ -604,7 +606,7 @@ a {
 }
 
 .footer-links a {
-  color: #ccc;
+  color: var(--neutral);
 }
 
 .footer-links a:hover {

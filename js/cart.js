@@ -58,7 +58,7 @@ function renderCart() {
         <span class="item-total">$${itemTotal.toFixed(2)}</span>
       </div>
       <div class="cart-remove">
-        <i class="fa-solid fa-trash remove-btn" data-index="${index}" style="cursor:pointer;color:#ff4d4f;"></i>
+        <i class="fa-solid fa-trash remove-btn" data-index="${index}"></i>
       </div>
     `;
 
