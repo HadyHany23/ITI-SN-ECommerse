@@ -1,57 +1,71 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile - NiloTronics</title>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Profile - NiloTronics</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+      rel="stylesheet" />
+    <link rel="stylesheet" href="../css/styles.css" />
+  </head>
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/styles.css" />
-</head>
+  <body>
+    <div id="navbar-placeholder"></div>
 
-<body>
-  <div id="navbar-placeholder"></div>
+    <main class="auth-section">
+      <div class="container">
+        <div id="profile-guest-view" class="auth-card mx-auto d-none">
+          <h2 class="auth-title mb-3">Profile</h2>
+          <p class="mb-3">You are not logged in.</p>
+          <div class="d-flex gap-2">
+            <a href="login.html" class="auth-btn text-center flex-fill"
+              >Login</a
+            >
+            <a href="register.html" class="auth-btn text-center flex-fill"
+              >Register</a
+            >
+          </div>
+        </div>
 
-  <main class="auth-section">
-    <div class="container">
-      <div id="profile-guest-view" class="auth-card mx-auto d-none">
-        <h2 class="auth-title mb-3">Profile</h2>
-        <p class="mb-3">You are not logged in.</p>
-        <div class="d-flex gap-2">
-          <a href="login.html" class="auth-btn text-center flex-fill">Login</a>
-          <a href="register.html" class="auth-btn text-center flex-fill">Register</a>
+        <div id="profile-user-view" class="auth-card mx-auto d-none">
+          <h2 class="auth-title mb-4">My Profile</h2>
+
+          <div class="profile-item">
+            <strong>Name:</strong> <span id="profile-name"></span>
+          </div>
+          <div class="profile-item">
+            <strong>Email:</strong> <span id="profile-email"></span>
+          </div>
+          <div class="profile-item">
+            <strong>Joined:</strong> <span id="profile-joined"></span>
+          </div>
+
+          <hr />
+
+          <form id="profile-edit-form">
+            <label for="edit-name" class="form-label">Update Name</label>
+            <input type="text" class="form-control" id="edit-name" required />
+            <button type="submit" class="auth-btn mt-3">Save</button>
+          </form>
+
+          <p id="profile-status" class="auth-status mt-3"></p>
+
+          <button id="logout-btn" class="auth-btn auth-btn-secondary mt-2">
+            Logout
+          </button>
         </div>
       </div>
+    </main>
 
-      <div id="profile-user-view" class="auth-card mx-auto d-none">
-        <h2 class="auth-title mb-4">My Profile</h2>
+    <div id="footer-placeholder"></div>
 
-        <div class="profile-item"><strong>Name:</strong> <span id="profile-name"></span></div>
-        <div class="profile-item"><strong>Email:</strong> <span id="profile-email"></span></div>
-        <div class="profile-item"><strong>Joined:</strong> <span id="profile-joined"></span></div>
-
-        <hr />
-
-        <form id="profile-edit-form">
-          <label for="edit-name" class="form-label">Update Name</label>
-          <input type="text" class="form-control" id="edit-name" required />
-          <button type="submit" class="auth-btn mt-3">Save</button>
-        </form>
-
-        <p id="profile-status" class="auth-status mt-3"></p>
-
-        <button id="logout-btn" class="auth-btn auth-btn-secondary mt-2">Logout</button>
-      </div>
-    </div>
-  </main>
-
-  <div id="footer-placeholder"></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../js/components.js"></script>
-  <script src="../js/auth.js"></script>
-</body>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/components.js"></script>
+    <script src="../js/auth.js"></script>
+  </body>
 </html>

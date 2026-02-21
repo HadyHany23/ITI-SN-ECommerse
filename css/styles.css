@@ -9,6 +9,11 @@
 
 /* ================= GLOBAL RESET ================= */
 
+html,
+body {
+  height: 100%;
+}
+
 body {
   background-color: var(--neutral);
   height: 100%;

@@ -1,8 +1,8 @@
-const inPages = window.location.pathname.includes('/pages/');
+const inPages = window.location.pathname.includes("/pages/");
 
-const base = inPages ? '../' : '';
+const base = inPages ? "../" : "";
 
-const pagesPath = inPages ? '' : 'pages/';
+const pagesPath = inPages ? "" : "pages/";
 
 const navbarHTML = `
   <nav class="navbar navbar-expand-lg navbar-light shadow-sm fixed-top">
@@ -34,6 +34,9 @@ const navbarHTML = `
           <li class="nav-item">
             <a class="nav-link" href="${pagesPath}contact.html">Contact</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="${pagesPath}orderHistory.html">Orders</a>
+          </li>
         </ul>
 
         <!-- Right Side Icons -->
@@ -52,7 +55,7 @@ const navbarHTML = `
 `;
 
 const footerHTML = `
-  <footer class="footer mt-5">
+  <footer class="footer mt-auto">
     <div class="container">
       <div class="row gy-4">
 
@@ -98,5 +101,5 @@ const footerHTML = `
   </footer>
 `;
 
-document.getElementById('navbar-placeholder').innerHTML = navbarHTML;
-document.getElementById('footer-placeholder').innerHTML = footerHTML;
+document.getElementById("navbar-placeholder").innerHTML = navbarHTML;
+document.getElementById("footer-placeholder").innerHTML = footerHTML;
