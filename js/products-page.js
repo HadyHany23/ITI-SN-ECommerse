@@ -8,86 +8,12 @@ document.getElementById('breadcrumb-category').textContent =
 
 // Container for products
 const container = document.getElementById('products-container');
-const db = window.appDb || createProductsDbFallback();
-
-function createProductsDbFallback() {
-  const sdk = window.supabase || window.supabaseJs;
-  const env = window.__ENV__;
-
-  if (
-    !sdk?.createClient ||
-    !env?.SUPABASE_URL ||
-    !env?.SUPABASE_PUBLISHABLE_KEY
-  ) {
-    return null;
-  }
-
-  const supabaseClientFallback = sdk.createClient(
-    env.SUPABASE_URL,
-    env.SUPABASE_PUBLISHABLE_KEY
-  );
-
-  return {
-    getCurrentUser() {
-      return JSON.parse(localStorage.getItem('currentUser'));
-    },
-    async getProductsByCategory(selectedCategory) {
-      const { data, error } = await supabaseClientFallback
-        .from('products')
-        .select('id, title, price, stock, thumbnail, category')
-        .eq('category', selectedCategory)
-        .order('id', { ascending: true });
-
-      if (error) throw error;
-      return data || [];
-    },
-    async addOrIncrementCartItem(userId, product) {
-      const { data: existing, error: existingError } =
-        await supabaseClientFallback
-          .from('cart_items')
-          .select('id, quantity, stock')
-          .eq('user_id', userId)
-          .eq('product_id', product.id)
-          .maybeSingle();
-
-      if (existingError) throw existingError;
-
-      if (existing) {
-        if (existing.quantity >= existing.stock) {
-          return { added: false, reason: 'stock_limit' };
-        }
-
-        const { error: updateError } = await supabaseClientFallback
-          .from('cart_items')
-          .update({ quantity: existing.quantity + 1 })
-          .eq('id', existing.id);
-
-        if (updateError) throw updateError;
-        return { added: true };
-      }
-
-      const { error: insertError } = await supabaseClientFallback
-        .from('cart_items')
-        .insert({
-          user_id: userId,
-          product_id: product.id,
-          name: product.name,
-          price: product.price,
-          image: product.image,
-          quantity: 1,
-          stock: product.stock,
-        });
-
-      if (insertError) throw insertError;
-      return { added: true };
-    },
-  };
-}
+const db = window.appDb;
 
 if (!db || typeof db.getProductsByCategory !== 'function') {
   container.innerHTML =
     "<h4 class='text-center mt-4'>Supabase is not initialized. Please regenerate env and refresh.</h4>";
-  throw new Error('Supabase client not initialized on products page');
+  console.error('Supabase client not initialized on products page');
 }
 
 // Notification message
@@ -206,16 +132,18 @@ function renderProducts(productsArray) {
 }
 
 // Fetch products from Supabase
-db.getProductsByCategory(category)
-  .then((data) => {
-    products = data || [];
-    renderProducts(products);
-  })
-  .catch((err) => {
-    console.error(err);
-    container.innerHTML =
-      "<h4 class='text-center mt-4'>Unable to load products right now.</h4>";
-  });
+if (db && typeof db.getProductsByCategory === 'function') {
+  db.getProductsByCategory(category)
+    .then((data) => {
+      products = data || [];
+      renderProducts(products);
+    })
+    .catch((err) => {
+      console.error(err);
+      container.innerHTML =
+        "<h4 class='text-center mt-4'>Unable to load products right now.</h4>";
+    });
+}
 
 // search on product by name
 const searchForm = document.getElementById('search-form');
