@@ -8,6 +8,87 @@ document.getElementById('breadcrumb-category').textContent =
 
 // Container for products
 const container = document.getElementById('products-container');
+const db = window.appDb || createProductsDbFallback();
+
+function createProductsDbFallback() {
+  const sdk = window.supabase || window.supabaseJs;
+  const env = window.__ENV__;
+
+  if (
+    !sdk?.createClient ||
+    !env?.SUPABASE_URL ||
+    !env?.SUPABASE_PUBLISHABLE_KEY
+  ) {
+    return null;
+  }
+
+  const supabaseClientFallback = sdk.createClient(
+    env.SUPABASE_URL,
+    env.SUPABASE_PUBLISHABLE_KEY
+  );
+
+  return {
+    getCurrentUser() {
+      return JSON.parse(localStorage.getItem('currentUser'));
+    },
+    async getProductsByCategory(selectedCategory) {
+      const { data, error } = await supabaseClientFallback
+        .from('products')
+        .select('id, title, price, stock, thumbnail, category')
+        .eq('category', selectedCategory)
+        .order('id', { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    },
+    async addOrIncrementCartItem(userId, product) {
+      const { data: existing, error: existingError } =
+        await supabaseClientFallback
+          .from('cart_items')
+          .select('id, quantity, stock')
+          .eq('user_id', userId)
+          .eq('product_id', product.id)
+          .maybeSingle();
+
+      if (existingError) throw existingError;
+
+      if (existing) {
+        if (existing.quantity >= existing.stock) {
+          return { added: false, reason: 'stock_limit' };
+        }
+
+        const { error: updateError } = await supabaseClientFallback
+          .from('cart_items')
+          .update({ quantity: existing.quantity + 1 })
+          .eq('id', existing.id);
+
+        if (updateError) throw updateError;
+        return { added: true };
+      }
+
+      const { error: insertError } = await supabaseClientFallback
+        .from('cart_items')
+        .insert({
+          user_id: userId,
+          product_id: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.image,
+          quantity: 1,
+          stock: product.stock,
+        });
+
+      if (insertError) throw insertError;
+      return { added: true };
+    },
+  };
+}
+
+if (!db || typeof db.getProductsByCategory !== 'function') {
+  container.innerHTML =
+    "<h4 class='text-center mt-4'>Supabase is not initialized. Please regenerate env and refresh.</h4>";
+  throw new Error('Supabase client not initialized on products page');
+}
 
 // Notification message
 function showToast(message) {
@@ -72,16 +153,21 @@ function renderProducts(productsArray) {
 
   // Add event listeners for Add to Cart buttons
   document.querySelectorAll('.btn-add').forEach((button) => {
-    button.addEventListener('click', (e) => {
+    button.addEventListener('click', async (e) => {
       e.preventDefault();
+
+      const currentUser = db.getCurrentUser();
+      if (!currentUser) {
+        alert('Please login to add items to your cart.');
+        window.location.href = '../pages/login.html';
+        return;
+      }
 
       const productId = button.getAttribute('data-id');
       const productName = button.getAttribute('data-name');
       const productPrice = parseFloat(button.getAttribute('data-price'));
       const productImage = button.getAttribute('data-image');
       const productStock = parseInt(button.getAttribute('data-stock'));
-
-      showToast(`${productName} added to cart`);
 
       if (
         !productId ||
@@ -94,49 +180,42 @@ function renderProducts(productsArray) {
         return;
       }
 
-      // Get existing cart
-      let cart = JSON.parse(localStorage.getItem('cart')) || [];
-      cart = cart.filter(
-        (item) => item && item.id && item.name && item.price && item.image
-      );
-
-      const existing = cart.find((item) => item.id == productId);
-      if (existing) {
-        if (existing.quantity + 1 > productStock) {
-          console.warn(
-            `Cannot add more than stock (${productStock}) for ${productName}`
-          );
-          alert(
-            `Cannot add more than stock (${productStock}) for ${productName}`
-          );
-          return; // prevent exceeding stock
-        }
-        existing.quantity += 1;
-      } else {
-        cart.push({
-          id: productId,
+      try {
+        const result = await db.addOrIncrementCartItem(currentUser.id, {
+          id: Number(productId),
           name: productName,
           price: productPrice,
-          quantity: 1,
           image: productImage,
           stock: productStock,
         });
-      }
 
-      localStorage.setItem('cart', JSON.stringify(cart));
-      console.log(`${productName} added to cart`, cart);
+        if (!result.added && result.reason === 'stock_limit') {
+          alert(
+            `Cannot add more than stock (${productStock}) for ${productName}`
+          );
+          return;
+        }
+
+        showToast(`${productName} has been added to your cart.`);
+      } catch (error) {
+        console.error(error);
+        alert('Unable to add item to cart right now.');
+      }
     });
   });
 }
 
-// Fetch products from DummyJSON
-fetch(`https://dummyjson.com/products/category/${category}`)
-  .then((res) => res.json())
+// Fetch products from Supabase
+db.getProductsByCategory(category)
   .then((data) => {
-    products = data.products; // store globally
+    products = data || [];
     renderProducts(products);
   })
-  .catch((err) => console.error(err));
+  .catch((err) => {
+    console.error(err);
+    container.innerHTML =
+      "<h4 class='text-center mt-4'>Unable to load products right now.</h4>";
+  });
 
 // search on product by name
 const searchForm = document.getElementById('search-form');

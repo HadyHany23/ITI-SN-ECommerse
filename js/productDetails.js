@@ -1,6 +1,7 @@
 // Get product ID from URL
 const params = new URLSearchParams(window.location.search);
 const productId = params.get('id');
+const db = window.appDb;
 
 const container = document.getElementById('product-details');
 
@@ -8,9 +9,12 @@ const container = document.getElementById('product-details');
 if (!productId) {
   container.innerHTML = '<p>Product not found.</p>';
 } else {
-  fetch(`https://dummyjson.com/products/${productId}`)
-    .then((res) => res.json())
+  db.getProductById(Number(productId))
     .then((product) => {
+      if (!product) {
+        container.innerHTML = '<p>Product not found.</p>';
+        return;
+      }
       renderProduct(product);
     })
     .catch(() => {
@@ -28,12 +32,20 @@ function renderProduct(product) {
 
   const stockClass =
     product.stock > 10 ? 'available' : product.stock > 0 ? 'low' : 'out';
+  const images = Array.isArray(product.images) ? product.images : [];
+  const displayImages = images.length > 0 ? images : [product.thumbnail];
+  const availabilityLabel =
+    product.stock > 10
+      ? 'In Stock'
+      : product.stock > 0
+      ? 'Low Stock'
+      : 'Out of Stock';
 
   container.innerHTML = `
     <div class="image-section">
-      <img id="main-image" src="${product.images[0]}" alt="${product.title}">
+      <img id="main-image" src="${displayImages[0]}" alt="${product.title}">
       <div class="thumbnail-row">
-        ${product.images
+        ${displayImages
           .map((img) => `<img src="${img}" class="thumb">`)
           .join('')}
       </div>
@@ -47,7 +59,7 @@ function renderProduct(product) {
       <p><strong>Rating:</strong> ${product.rating}</p>
       <p class="price">$${product.price}</p>
       <p class="stock ${stockClass}">
-        <strong>Status:</strong> ${product.availabilityStatus}
+        <strong>Status:</strong> ${availabilityLabel}
       </p>
       <p><strong>Stock:</strong> ${product.stock}</p>
 
@@ -72,30 +84,32 @@ function renderProduct(product) {
 
   // Add to cart logic
   const addBtn = document.querySelector('.btn-add');
-  addBtn.addEventListener('click', () => {
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+  addBtn.addEventListener('click', async () => {
+    const currentUser = db.getCurrentUser();
+    if (!currentUser) {
+      alert('Please login to add items to your cart.');
+      window.location.href = '../pages/login.html';
+      return;
+    }
 
-    const existing = cart.find((item) => item.id == product.id);
+    try {
+      const result = await db.addOrIncrementCartItem(currentUser.id, {
+        id: Number(product.id),
+        name: product.title,
+        price: Number(product.price),
+        image: product.thumbnail,
+        stock: Number(product.stock),
+      });
 
-    if (existing) {
-      if (existing.quantity < product.stock) {
-        existing.quantity += 1;
-      } else {
+      if (!result.added && result.reason === 'stock_limit') {
         alert('Max stock reached');
         return;
       }
-    } else {
-      cart.push({
-        id: product.id,
-        name: product.title,
-        price: product.price,
-        image: product.thumbnail,
-        quantity: 1,
-        stock: product.stock,
-      });
-    }
 
-    localStorage.setItem('cart', JSON.stringify(cart));
-    alert('Added to cart');
+      alert('This item has been added to your cart successfully.');
+    } catch (error) {
+      console.error(error);
+      alert('Unable to add item to cart right now.');
+    }
   });
 }

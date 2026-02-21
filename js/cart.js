@@ -1,8 +1,6 @@
-// Get cart from localStorage and filter invalid items
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
-cart = cart.filter(
-  (item) => item && item.id && item.name && item.price && item.image
-); // This line removes any broken product.
+const db = window.appDb;
+let cart = [];
+const currentUser = db.getCurrentUser();
 
 const container = document.getElementById('cart-container');
 const totalEl = document.getElementById('cart-total');
@@ -30,7 +28,22 @@ function showToast(message) {
 }
 
 // Render cart items
-function renderCart() {
+async function renderCart() {
+  if (!currentUser) {
+    container.innerHTML = '<p>Please login to view your cart.</p>';
+    totalEl.textContent = '0';
+    return;
+  }
+
+  try {
+    cart = await db.getCartItems(currentUser.id);
+  } catch (error) {
+    console.error(error);
+    container.innerHTML = '<p>Unable to load cart right now.</p>';
+    totalEl.textContent = '0';
+    return;
+  }
+
   container.innerHTML = '';
   if (cart.length === 0) {
     container.innerHTML = '<p>Your cart is empty.</p>';
@@ -58,7 +71,7 @@ function renderCart() {
         <span class="item-total">$${itemTotal.toFixed(2)}</span>
       </div>
       <div class="cart-remove">
-        <i class="fa-solid fa-trash remove-btn" data-index="${index}" style="cursor:pointer;color:#ff4d4f;"></i>
+        <i class="fa-solid fa-trash remove-btn" data-index="${index}"></i>
       </div>
     `;
 
@@ -71,7 +84,7 @@ function renderCart() {
   document
     .querySelectorAll('.cart-info input[type="number"]')
     .forEach((input) => {
-      input.addEventListener('input', (e) => {
+      input.addEventListener('input', async (e) => {
         const idx = e.target.getAttribute('data-index');
         let val = parseInt(e.target.value);
         if (isNaN(val) || val < 1) val = 1;
@@ -85,27 +98,41 @@ function renderCart() {
           e.target.value = stock;
         }
 
-        cart[idx].quantity = val;
-        localStorage.setItem('cart', JSON.stringify(cart));
-        renderCart();
+        try {
+          await db.updateCartQuantity(currentUser.id, cart[idx].id, val);
+          await renderCart();
+        } catch (error) {
+          console.error(error);
+          alert('Unable to update quantity right now.');
+        }
       });
     });
 
   // Event listener for remove button
   document.querySelectorAll('.remove-btn').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', async () => {
       const idx = btn.getAttribute('data-index');
-      showToast(`${cart[idx].name} removed from cart`);
-      cart.splice(idx, 1);
-      localStorage.setItem('cart', JSON.stringify(cart));
-      renderCart();
+      try {
+        const itemName = cart[idx].name;
+        await db.removeCartItem(currentUser.id, cart[idx].id);
+        showToast(`${itemName} removed from cart`);
+        await renderCart();
+      } catch (error) {
+        console.error(error);
+        alert('Unable to remove item right now.');
+      }
     });
   });
 }
 
 // Checkout button
 document.getElementById('checkout-btn').addEventListener('click', () => {
-  localStorage.setItem('checkout-cart', JSON.stringify(cart));
+  if (!currentUser) {
+    alert('Please login to continue to checkout.');
+    window.location.href = '../pages/login.html';
+    return;
+  }
+
   window.location.href = '../pages/checkout.html';
 });
 

@@ -1,21 +1,4 @@
-const USERS_KEY = 'users';
-const CURRENT_USER_KEY = 'currentUser';
-
-function getUsers() {
-  return JSON.parse(localStorage.getItem(USERS_KEY)) || [];
-}
-
-function saveUsers(users) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
-
-function getCurrentUser() {
-  return JSON.parse(localStorage.getItem(CURRENT_USER_KEY));
-}
-
-function setCurrentUser(user) {
-  localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-}
+const db = window.appDb;
 
 function sanitizeEmail(email) {
   return email.trim().toLowerCase();
@@ -29,7 +12,7 @@ function initializeRegisterPage() {
     return;
   }
 
-  form.addEventListener('submit', (event) => {
+  form.addEventListener('submit', async (event) => {
     event.preventDefault();
 
     const name = document.getElementById('register-name').value.trim();
@@ -53,38 +36,36 @@ function initializeRegisterPage() {
       return;
     }
 
-    const users = getUsers();
-    const alreadyExists = users.some((user) => user.email === email);
+    try {
+      const existingUser = await db.findProfileByEmail(email);
 
-    if (alreadyExists) {
-      status.textContent = 'Email already exists. Please login.';
+      if (existingUser) {
+        status.textContent = 'Email already exists. Please login.';
+        status.className = 'auth-status error';
+        return;
+      }
+
+      const createdUser = await db.registerProfile({
+        id: Date.now().toString(),
+        name,
+        email,
+        password,
+        createdAt: new Date().toISOString(),
+      });
+
+      db.setCurrentUser(createdUser);
+      status.textContent = 'Account created successfully. Redirecting...';
+      status.className = 'auth-status success';
+
+      setTimeout(() => {
+        window.location.href = 'profile.html';
+      }, 700);
+    } catch (error) {
+      console.error(error);
+      status.textContent =
+        'Unable to create account right now. Please try again.';
       status.className = 'auth-status error';
-      return;
     }
-
-    const newUser = {
-      id: Date.now().toString(),
-      name,
-      email,
-      password,
-      createdAt: new Date().toISOString(),
-    };
-
-    users.push(newUser);
-    saveUsers(users);
-    setCurrentUser({
-      id: newUser.id,
-      name: newUser.name,
-      email: newUser.email,
-      createdAt: newUser.createdAt,
-    });
-
-    status.textContent = 'Account created successfully. Redirecting...';
-    status.className = 'auth-status success';
-
-    setTimeout(() => {
-      window.location.href = 'profile.html';
-    }, 700);
   });
 }
 
@@ -96,42 +77,40 @@ function initializeLoginPage() {
     return;
   }
 
-  const loggedInUser = getCurrentUser();
+  const loggedInUser = db.getCurrentUser();
   if (loggedInUser) {
     window.location.href = 'profile.html';
     return;
   }
 
-  form.addEventListener('submit', (event) => {
+  form.addEventListener('submit', async (event) => {
     event.preventDefault();
 
     const email = sanitizeEmail(document.getElementById('login-email').value);
     const password = document.getElementById('login-password').value;
 
-    const users = getUsers();
-    const matchedUser = users.find(
-      (user) => user.email === email && user.password === password
-    );
+    try {
+      const matchedUser = await db.loginProfile(email, password);
 
-    if (!matchedUser) {
-      status.textContent = 'Invalid email or password.';
+      if (!matchedUser) {
+        status.textContent = 'Invalid email or password.';
+        status.className = 'auth-status error';
+        return;
+      }
+
+      db.setCurrentUser(matchedUser);
+
+      status.textContent = 'Login successful. Redirecting...';
+      status.className = 'auth-status success';
+
+      setTimeout(() => {
+        window.location.href = 'profile.html';
+      }, 700);
+    } catch (error) {
+      console.error(error);
+      status.textContent = 'Unable to login right now. Please try again.';
       status.className = 'auth-status error';
-      return;
     }
-
-    setCurrentUser({
-      id: matchedUser.id,
-      name: matchedUser.name,
-      email: matchedUser.email,
-      createdAt: matchedUser.createdAt,
-    });
-
-    status.textContent = 'Login successful. Redirecting...';
-    status.className = 'auth-status success';
-
-    setTimeout(() => {
-      window.location.href = 'profile.html';
-    }, 700);
   });
 }
 
@@ -150,7 +129,7 @@ function initializeProfilePage() {
     return;
   }
 
-  const currentUser = getCurrentUser();
+  const currentUser = db.getCurrentUser();
 
   if (!currentUser) {
     guestView.classList.remove('d-none');
@@ -169,11 +148,11 @@ function initializeProfilePage() {
   editName.value = currentUser.name;
 
   logoutBtn.addEventListener('click', () => {
-    localStorage.removeItem(CURRENT_USER_KEY);
+    db.clearCurrentUser();
     window.location.href = 'login.html';
   });
 
-  editForm.addEventListener('submit', (event) => {
+  editForm.addEventListener('submit', async (event) => {
     event.preventDefault();
 
     const updatedName = editName.value.trim();
@@ -184,20 +163,20 @@ function initializeProfilePage() {
       return;
     }
 
-    const users = getUsers();
-    const userIndex = users.findIndex((user) => user.id === currentUser.id);
-
-    if (userIndex !== -1) {
-      users[userIndex].name = updatedName;
-      saveUsers(users);
+    try {
+      const updatedUser = await db.updateProfileName(
+        currentUser.id,
+        updatedName
+      );
+      db.setCurrentUser(updatedUser);
+      nameEl.textContent = updatedUser.name;
+      status.textContent = 'Profile updated successfully.';
+      status.className = 'auth-status success mt-3';
+    } catch (error) {
+      console.error(error);
+      status.textContent = 'Unable to update profile right now.';
+      status.className = 'auth-status error mt-3';
     }
-
-    const updatedCurrentUser = { ...currentUser, name: updatedName };
-    setCurrentUser(updatedCurrentUser);
-
-    nameEl.textContent = updatedName;
-    status.textContent = 'Profile updated successfully.';
-    status.className = 'auth-status success mt-3';
   });
 }
 
