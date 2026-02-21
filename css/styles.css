@@ -92,6 +92,12 @@ a {
   object-fit: cover;
 }
 
+@media (max-width: 767.98px) {
+  .hero-slider {
+    display: none;
+  }
+}
+
 /* ================= SECTION TITLE ================= */
 
 .section-title {
