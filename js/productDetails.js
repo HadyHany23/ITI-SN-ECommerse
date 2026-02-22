@@ -17,7 +17,6 @@ if (!productId) {
 }
 
 function renderProduct(product) {
-
   const stockClass =
     product.stock > 10 ? 'available' : product.stock > 0 ? 'low' : 'out';
 
@@ -37,7 +36,7 @@ function renderProduct(product) {
       <p><strong>Category:</strong> ${product.category}</p>
       <p><strong>Brand:</strong> ${product.brand}</p>
       <p><strong>Rating:</strong> ${product.rating}</p>
-      <p class="price">$${product.price}</p>
+      <p class="price">${product.price} EGP</p>
       <p class="stock ${stockClass}">
         <strong>Status:</strong> ${product.availabilityStatus}
       </p>

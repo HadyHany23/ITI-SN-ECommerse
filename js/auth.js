@@ -47,6 +47,18 @@ function initializeRegisterPage() {
       return;
     }
 
+    if (!email.includes('@')) {
+      status.textContent = 'Email must contain @.';
+      status.className = 'auth-status error';
+      return;
+    }
+
+    if (password.length < 8) {
+      status.textContent = 'Password must be at least 8 characters.';
+      status.className = 'auth-status error';
+      return;
+    }
+
     if (password !== confirmPassword) {
       status.textContent = 'Passwords do not match.';
       status.className = 'auth-status error';

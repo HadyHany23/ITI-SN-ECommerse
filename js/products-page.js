@@ -10,7 +10,7 @@ function showToast(message) {
   const containerToast = document.getElementById('toast-container');
 
   const toast = document.createElement('div');
-  toast.classList.add('toast'); 
+  toast.classList.add('toast');
   toast.textContent = message;
 
   containerToast.appendChild(toast);
@@ -49,7 +49,7 @@ function renderProducts(productsArray) {
         <div class="product-info">
           <div>
             <div class="product-name">${product.title}</div>
-            <div class="product-price">$${product.price}</div>
+            <div class="product-price">${product.price} EGP</div>
           </div>
           <a href="#" class="btn-add" 
              data-id="${product.id}"
@@ -99,7 +99,7 @@ function renderProducts(productsArray) {
           alert(
             `Cannot add more than stock (${productStock}) for ${productName}`
           );
-          return; 
+          return;
         }
         existing.quantity += 1;
       } else {
@@ -123,7 +123,7 @@ function renderProducts(productsArray) {
 fetch(`https://dummyjson.com/products/category/${category}`)
   .then((res) => res.json())
   .then((data) => {
-    products = data.products; 
+    products = data.products;
     renderProducts(products);
   })
   .catch((err) => console.error(err));

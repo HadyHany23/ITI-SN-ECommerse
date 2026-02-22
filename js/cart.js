@@ -54,7 +54,7 @@ function renderCart() {
 
       <div class="cart-info flex-grow-1 ms-3">
         <div class="cart-title fw-bold">${item.name}</div>
-        <div class="cart-price">$${item.price}</div>
+        <div class="cart-price">${item.price} EGP</div>
 
         <div class="d-flex align-items-center gap-2 mt-2">
           <button class="btn btn-outline-secondary btn-sm qty-decrease" data-index="${index}">-</button>
@@ -71,7 +71,7 @@ function renderCart() {
         </div>
 
         <div class="mt-2">
-          <span class="item-total">$${itemTotal.toFixed(2)}</span>
+          <span class="item-total">${itemTotal.toFixed(2)} EGP</span>
         </div>
       </div>
 
