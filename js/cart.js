@@ -1,4 +1,3 @@
-// ================= GET CART =================
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
 cart = cart.filter(
@@ -9,12 +8,10 @@ const container = document.getElementById('cart-container');
 const totalEl = document.getElementById('cart-total');
 const checkoutBtn = document.getElementById('checkout-btn');
 
-// ================= SAVE CART =================
 function saveCart() {
   localStorage.setItem('cart', JSON.stringify(cart));
 }
 
-// ================= TOAST =================
 function showToast(message) {
   const toastContainer = document.getElementById('toast-container');
 
@@ -32,7 +29,6 @@ function showToast(message) {
   }, 2500);
 }
 
-// ================= RENDER CART =================
 function renderCart() {
   container.innerHTML = '';
 
@@ -92,14 +88,12 @@ function renderCart() {
   totalEl.textContent = totalPrice.toFixed(2);
 }
 
-// ================= EVENT DELEGATION =================
 container.addEventListener('click', function (e) {
   const index = e.target.dataset.index;
   if (index === undefined) return;
 
   const stock = cart[index].stock || 100;
 
-  // ➕ Increase
   if (e.target.classList.contains('qty-increase')) {
     if (cart[index].quantity < stock) {
       cart[index].quantity++;
@@ -110,7 +104,6 @@ container.addEventListener('click', function (e) {
     }
   }
 
-  // ➖ Decrease
   if (e.target.classList.contains('qty-decrease')) {
     if (cart[index].quantity > 1) {
       cart[index].quantity--;
@@ -119,7 +112,6 @@ container.addEventListener('click', function (e) {
     }
   }
 
-  // 🗑 Remove
   if (e.target.classList.contains('remove-btn')) {
     showToast(`${cart[index].name} removed from cart`);
     cart.splice(index, 1);
@@ -128,7 +120,6 @@ container.addEventListener('click', function (e) {
   }
 });
 
-// ================= INPUT CHANGE =================
 container.addEventListener('input', function (e) {
   if (!e.target.classList.contains('qty-input')) return;
 
@@ -147,7 +138,6 @@ container.addEventListener('input', function (e) {
   renderCart();
 });
 
-// ================= CHECKOUT =================
 if (checkoutBtn) {
   checkoutBtn.addEventListener('click', () => {
     localStorage.setItem('checkout-cart', JSON.stringify(cart));
@@ -155,5 +145,4 @@ if (checkoutBtn) {
   });
 }
 
-// ================= INITIAL RENDER =================
 renderCart();

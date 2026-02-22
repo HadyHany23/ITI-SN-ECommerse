@@ -1,20 +1,16 @@
-// Get selected category from URL
 const params = new URLSearchParams(window.location.search);
 const category = params.get('category') || 'smartphones';
 
-// Update breadcrumb
 document.getElementById('breadcrumb-category').textContent =
   category.charAt(0).toUpperCase() + category.slice(1);
 
-// Container for products
 const container = document.getElementById('products-container');
 
-// Notification message
 function showToast(message) {
   const containerToast = document.getElementById('toast-container');
 
   const toast = document.createElement('div');
-  toast.classList.add('toast'); // this is for css
+  toast.classList.add('toast'); 
   toast.textContent = message;
 
   containerToast.appendChild(toast);
@@ -31,10 +27,8 @@ function showToast(message) {
   }, 2500);
 }
 
-// Store products globally for search
 let products = [];
 
-// Render products function
 function renderProducts(productsArray) {
   container.innerHTML = '';
 
@@ -70,7 +64,6 @@ function renderProducts(productsArray) {
     container.appendChild(col);
   });
 
-  // Add event listeners for Add to Cart buttons
   document.querySelectorAll('.btn-add').forEach((button) => {
     button.addEventListener('click', (e) => {
       e.preventDefault();
@@ -92,7 +85,6 @@ function renderProducts(productsArray) {
         return;
       }
 
-      // Get existing cart
       let cart = JSON.parse(localStorage.getItem('cart')) || [];
       cart = cart.filter(
         (item) => item && item.id && item.name && item.price && item.image
@@ -107,7 +99,7 @@ function renderProducts(productsArray) {
           alert(
             `Cannot add more than stock (${productStock}) for ${productName}`
           );
-          return; // prevent exceeding stock
+          return; 
         }
         existing.quantity += 1;
       } else {
@@ -128,16 +120,14 @@ function renderProducts(productsArray) {
   });
 }
 
-// Fetch products from DummyJSON
 fetch(`https://dummyjson.com/products/category/${category}`)
   .then((res) => res.json())
   .then((data) => {
-    products = data.products; // store globally
+    products = data.products; 
     renderProducts(products);
   })
   .catch((err) => console.error(err));
 
-// search on product by name
 const searchForm = document.getElementById('search-form');
 const searchInput = document.getElementById('search-input');
 
@@ -147,7 +137,7 @@ searchForm.addEventListener('submit', (e) => {
   const searchValue = searchInput.value.trim().toLowerCase();
 
   if (searchValue === '') {
-    renderProducts(products); // show all if empty
+    renderProducts(products);
     return;
   }
 

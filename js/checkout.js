@@ -22,12 +22,11 @@ document.addEventListener('DOMContentLoaded', function () {
     return;
   }
 
-  // Notification message
   function showToast(message) {
     const container = document.getElementById('toast-container');
 
     const toast = document.createElement('div');
-    toast.classList.add('toast'); // this is for css
+    toast.classList.add('toast'); 
     toast.textContent = message;
 
     container.appendChild(toast);
@@ -99,7 +98,6 @@ document.addEventListener('DOMContentLoaded', function () {
     localStorage.removeItem('cart');
 
     showToast(`${order.customer.name} your order is placed successfully`);
-    // alert("Order placed successfully!");
 
     setTimeout(() => {
       window.location.href = '../index.html';

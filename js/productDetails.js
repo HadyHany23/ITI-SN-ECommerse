@@ -1,10 +1,8 @@
-// Get product ID from URL
 const params = new URLSearchParams(window.location.search);
 const productId = params.get('id');
 
 const container = document.getElementById('product-details');
 
-// If no ID
 if (!productId) {
   container.innerHTML = '<p>Product not found.</p>';
 } else {
@@ -19,12 +17,6 @@ if (!productId) {
 }
 
 function renderProduct(product) {
-  //   const availability =
-  //     product.stock > 10
-  //       ? "In Stock"
-  //       : product.stock > 0
-  //         ? "Low Stock"
-  //         : "Out of Stock";
 
   const stockClass =
     product.stock > 10 ? 'available' : product.stock > 0 ? 'low' : 'out';
@@ -62,7 +54,6 @@ function renderProduct(product) {
     </div>
   `;
 
-  // Image slider logic
   const mainImage = document.getElementById('main-image');
   document.querySelectorAll('.thumb').forEach((thumb) => {
     thumb.addEventListener('click', () => {
@@ -70,7 +61,6 @@ function renderProduct(product) {
     });
   });
 
-  // Add to cart logic
   const addBtn = document.querySelector('.btn-add');
   addBtn.addEventListener('click', () => {
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
