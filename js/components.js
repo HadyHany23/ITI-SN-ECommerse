@@ -1,8 +1,8 @@
-const inPages = window.location.pathname.includes("/pages/");
+const inPages = window.location.pathname.includes('/pages/');
 
-const base = inPages ? "../" : "";
+const base = inPages ? '../' : '';
 
-const pagesPath = inPages ? "" : "pages/";
+const pagesPath = inPages ? '' : 'pages/';
 
 const navbarHTML = `
   <nav class="navbar navbar-expand-lg navbar-light shadow-sm fixed-top">
@@ -101,5 +101,5 @@ const footerHTML = `
   </footer>
 `;
 
-document.getElementById("navbar-placeholder").innerHTML = navbarHTML;
-document.getElementById("footer-placeholder").innerHTML = footerHTML;
+document.getElementById('navbar-placeholder').innerHTML = navbarHTML;
+document.getElementById('footer-placeholder').innerHTML = footerHTML;

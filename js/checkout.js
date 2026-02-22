@@ -1,8 +1,21 @@
 document.addEventListener('DOMContentLoaded', function () {
   const cart = JSON.parse(localStorage.getItem('cart')) || [];
+  const currentUser = JSON.parse(localStorage.getItem('currentUser'));
   const orderDetailsContainer = document.getElementById('orderDetails');
   const orderTotalElement = document.getElementById('orderTotal');
   const checkoutForm = document.getElementById('checkoutForm');
+  const nameInput = document.getElementById('name');
+  const emailInput = document.getElementById('email');
+
+  if (currentUser) {
+    if (nameInput && currentUser.name) {
+      nameInput.value = currentUser.name;
+    }
+
+    if (emailInput && currentUser.email) {
+      emailInput.value = currentUser.email;
+    }
+  }
 
   if (cart.length === 0) {
     orderDetailsContainer.innerHTML = '<p>Your cart is empty.</p>';
@@ -58,12 +71,15 @@ document.addEventListener('DOMContentLoaded', function () {
   checkoutForm.addEventListener('submit', function (e) {
     e.preventDefault();
 
+    const normalizedEmail = emailInput.value.trim().toLowerCase();
+
     const order = {
       id: 'ORD-' + Date.now(),
       date: new Date().toISOString(),
+      userId: currentUser?.id || null,
       customer: {
-        name: document.getElementById('name').value,
-        email: document.getElementById('email').value,
+        name: nameInput.value.trim(),
+        email: normalizedEmail,
         phone: document.getElementById('phone').value,
         address: document.getElementById('address').value,
         city: document.getElementById('city').value,

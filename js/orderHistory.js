@@ -1,7 +1,8 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const ordersContainer = document.getElementById("ordersContainer");
+document.addEventListener('DOMContentLoaded', function () {
+  const ordersContainer = document.getElementById('ordersContainer');
 
   const currentUser = getCurrentUser();
+  const normalizedCurrentEmail = currentUser?.email?.trim().toLowerCase();
 
   if (!currentUser) {
     ordersContainer.innerHTML = `
@@ -10,16 +11,25 @@ document.addEventListener("DOMContentLoaded", function () {
       </div>
     `;
     setTimeout(() => {
-      window.location.href = "login.html";
+      window.location.href = 'login.html';
     }, 5000);
     return;
   }
 
-  const allOrders = JSON.parse(localStorage.getItem("orderhistory")) || [];
+  const allOrders = JSON.parse(localStorage.getItem('orderhistory')) || [];
 
-  const userOrders = allOrders.filter(
-    (order) => order.customer.email === currentUser.email,
-  );
+  const userOrders = allOrders.filter((order) => {
+    if (!order) return false;
+
+    if (order.userId && currentUser.id) {
+      return order.userId === currentUser.id;
+    }
+
+    const orderEmail = order.customer?.email?.trim().toLowerCase();
+    return orderEmail && normalizedCurrentEmail
+      ? orderEmail === normalizedCurrentEmail
+      : false;
+  });
 
   if (userOrders.length === 0) {
     ordersContainer.innerHTML = `
@@ -31,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   userOrders.forEach((order) => {
-    let itemsHTML = "";
+    let itemsHTML = '';
 
     order.items.forEach((item) => {
       itemsHTML += `
